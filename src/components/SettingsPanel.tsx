@@ -26,10 +26,10 @@ export default function SettingsPanel({
   return (
     <aside
       ref={ref}
-      className="w-80 bg-white border-l border-gray-200 shadow-lg"
+      className="w-full lg:w-80 h-full bg-white border-l border-gray-200 shadow-lg overflow-y-auto"
     >
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="p-4 lg:p-6">
+        <div className="flex items-center justify-between mb-4 lg:mb-6">
           <h3 className="text-lg font-semibold text-gray-900">Node Settings</h3>
           <button
             onClick={close}
@@ -47,7 +47,7 @@ export default function SettingsPanel({
               Node Name
             </label>
             <input
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm lg:text-base"
               value={node.data.label || ''}
               onChange={(e) => updateNode("label", e.target.value)}
               placeholder="Enter node name"
@@ -59,7 +59,7 @@ export default function SettingsPanel({
               Description
             </label>
             <textarea
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-sm lg:text-base"
               rows={3}
               value={node.data.description || ''}
               onChange={(e) => updateNode("description", e.target.value)}
@@ -73,7 +73,7 @@ export default function SettingsPanel({
                 Default Value
               </label>
               <input
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm lg:text-base"
                 value={node.data.value || ''}
                 onChange={(e) => updateNode("value", e.target.value)}
                 placeholder="Enter default value"

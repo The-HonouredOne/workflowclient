@@ -26,6 +26,7 @@ export default function App() {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [currentWorkflow, setCurrentWorkflow] = useState<any>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadWorkflows();
@@ -169,22 +170,51 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <div className={`
+        fixed lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-50
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:block
+      `}>
+        <Sidebar onClose={() => setSidebarOpen(false)} />
+      </div>
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Workflow Builder</h1>
-              {currentWorkflow && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Currently loaded: <span className="font-medium">Workflow {currentWorkflow._id.slice(-6)}</span>
-                </p>
-              )}
-            </div>
             <div className="flex items-center gap-3">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              
+              <div>
+                <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Workflow Builder</h1>
+                {currentWorkflow && (
+                  <p className="text-xs lg:text-sm text-gray-600 mt-1">
+                    Currently loaded: <span className="font-medium">Workflow {currentWorkflow._id.slice(-6)}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            {/* Desktop Controls */}
+            <div className="hidden lg:flex items-center gap-3">
               <button
                 onClick={saveWorkflow}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -238,6 +268,65 @@ export default function App() {
                 🆕 New Workflow
               </button>
             </div>
+            
+            {/* Mobile Action Button */}
+            <div className="lg:hidden">
+              <button
+                onClick={saveWorkflow}
+                className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                💾 Save
+              </button>
+            </div>
+          </div>
+          
+          {/* Mobile Controls Row */}
+          <div className="lg:hidden mt-3 flex gap-2 overflow-x-auto pb-2">
+            <select
+              onChange={(e) => e.target.value && loadWorkflow(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-0 flex-shrink-0"
+              defaultValue=""
+            >
+              <option value="">📂 Load</option>
+              {workflows.map((wf) => (
+                <option key={wf._id} value={wf._id}>
+                  {wf._id.slice(-6)}
+                </option>
+              ))}
+            </select>
+            
+            <button
+              onClick={exportWorkflow}
+              className="inline-flex items-center px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors flex-shrink-0"
+            >
+              📤
+            </button>
+            
+            <label className="inline-flex items-center px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors cursor-pointer flex-shrink-0">
+              📥
+              <input
+                type="file"
+                accept=".json"
+                onChange={importWorkflow}
+                className="hidden"
+              />
+            </label>
+            
+            {currentWorkflow && (
+              <button
+                onClick={deleteCurrentWorkflow}
+                className="inline-flex items-center px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors flex-shrink-0"
+              >
+                🗑️
+              </button>
+            )}
+            
+            <button
+              onClick={clearCanvas}
+              className="inline-flex items-center px-3 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors flex-shrink-0"
+            >
+              🆕
+            </button>
           </div>
         </header>
 
@@ -301,24 +390,30 @@ export default function App() {
       </div>
 
       {selectedNode && (
-        <SettingsPanel
-          node={nodes.find(n => n.id === selectedNode.id) || selectedNode}
-          updateNode={(k, v) => {
-            setNodes((nds) =>
-              nds.map((n) =>
-                n.id === selectedNode.id
-                  ? { ...n, data: { ...n.data, [k]: v } }
-                  : n
-              )
-            );
-            // Update selectedNode to keep it in sync
-            setSelectedNode(prev => prev ? {
-              ...prev,
-              data: { ...prev.data, [k]: v }
-            } : null);
-          }}
-          close={() => setSelectedNode(null)}
-        />
+        <div className={`
+          fixed lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-50
+          ${selectedNode ? 'translate-x-0' : 'translate-x-full'}
+          right-0 top-0 h-full
+        `}>
+          <SettingsPanel
+            node={nodes.find(n => n.id === selectedNode.id) || selectedNode}
+            updateNode={(k, v) => {
+              setNodes((nds) =>
+                nds.map((n) =>
+                  n.id === selectedNode.id
+                    ? { ...n, data: { ...n.data, [k]: v } }
+                    : n
+                )
+              );
+              // Update selectedNode to keep it in sync
+              setSelectedNode(prev => prev ? {
+                ...prev,
+                data: { ...prev.data, [k]: v }
+              } : null);
+            }}
+            close={() => setSelectedNode(null)}
+          />
+        </div>
       )}
     </div>
   );
