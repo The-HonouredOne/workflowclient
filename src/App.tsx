@@ -32,6 +32,9 @@ export default function App() {
     loadWorkflows();
   }, []);
 
+
+  // -------------load all workflowslist ---------------------------------
+
   const loadWorkflows = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/workflows`);
@@ -42,6 +45,9 @@ export default function App() {
   };
 
   propagateData(nodes, edges);
+
+
+  //---------------------------- for saving or updating workflow-------------------
 
   const saveWorkflow = async () => {
     const errors = validateWorkflow(nodes, edges);
@@ -70,6 +76,9 @@ export default function App() {
     }
   };
 
+
+  // --------------------------------------load the workflow selected from dropdown---------------------------
+
   const loadWorkflow = async (id: string) => {
     try {
       const response = await axios.get(`${API_URL}/api/workflows/${id}`);
@@ -80,6 +89,9 @@ export default function App() {
       alert("Failed to load workflow");
     }
   };
+
+
+  // ------------------------------delete workflow that have been loaded by clicking on dropdown------------------
 
   const deleteCurrentWorkflow = async () => {
     if (!currentWorkflow) return;
@@ -104,6 +116,9 @@ export default function App() {
     setCurrentWorkflow(null);
   };
 
+
+
+  //--------------------------- export work flow--------------------------
   const exportWorkflow = () => {
     const workflowData = {
       nodes,
@@ -124,6 +139,9 @@ export default function App() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+
+//  -------------------------------- import workflow----------------------------------
 
   const importWorkflow = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
