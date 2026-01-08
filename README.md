@@ -163,19 +163,7 @@ NODE_ENV=development
 - **Import**: Click "Import" to upload JSON file
 - **Clear**: Click "New Workflow" to start fresh
 
-## Testing
 
-### Frontend Tests
-```bash
-cd client
-npm test
-```
-
-### Backend Tests
-```bash
-cd server
-npm test
-```
 
 ## Deployment
 
