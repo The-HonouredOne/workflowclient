@@ -47,11 +47,22 @@ export default function App() {
     if (errors.length) return alert(errors.join("\n"));
 
     try {
-      await axios.post(`${API_URL}/api/workflows`, {
-        nodes,
-        edges
-      });
-      alert("Workflow saved");
+      if (currentWorkflow && currentWorkflow._id) {
+        // Update existing workflow
+        await axios.put(`${API_URL}/api/workflows/${currentWorkflow._id}`, {
+          nodes,
+          edges
+        });
+        alert("Workflow updated");
+      } else {
+        // Create new workflow
+        const response = await axios.post(`${API_URL}/api/workflows`, {
+          nodes,
+          edges
+        });
+        setCurrentWorkflow(response.data);
+        alert("Workflow saved");
+      }
       loadWorkflows();
     } catch (error) {
       alert("Failed to save workflow");
@@ -178,7 +189,7 @@ export default function App() {
                 onClick={saveWorkflow}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
-                💾 Save Workflow
+                💾 {currentWorkflow ? 'Update Workflow' : 'Save Workflow'}
               </button>
               <select
                 onChange={(e) => e.target.value && loadWorkflow(e.target.value)}
