@@ -246,12 +246,23 @@ export default function App() {
           className="flex-1 relative"
           onDrop={(e) => {
             const type = e.dataTransfer.getData("nodeType");
+            if (!type) return;
+
+            // Get the ReactFlow wrapper element
+            const reactFlowBounds = e.currentTarget.getBoundingClientRect();
+            
+            // Calculate position relative to the ReactFlow canvas
+            const position = {
+              x: e.clientX - reactFlowBounds.left,
+              y: e.clientY - reactFlowBounds.top,
+            };
+
             setNodes((n) => [
               ...n,
               {
                 id: crypto.randomUUID(),
                 type: type === "input" ? "inputNode" : "outputNode",
-                position: { x: 200, y: 200 },
+                position,
                 data: { label: type, description: "", value: "" }
               }
             ]);
