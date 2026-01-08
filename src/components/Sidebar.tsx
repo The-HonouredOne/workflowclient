@@ -3,6 +3,13 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
     e.dataTransfer.setData("nodeType", type);
   };
 
+  const onNodeClick = (type: string) => {
+    // For mobile - dispatch custom event to add node
+    const event = new CustomEvent('addNode', { detail: { type } });
+    window.dispatchEvent(event);
+    onClose?.(); // Close sidebar on mobile
+  };
+
   return (
     <aside className="w-72 lg:w-72 h-full bg-white border-r border-gray-200 p-4 lg:p-6 overflow-y-auto">
       {/* Mobile Close Button */}
@@ -10,6 +17,7 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Node Library</h2>
           <p className="text-sm text-gray-600 hidden lg:block">Drag nodes to the canvas to build your workflow</p>
+          <p className="text-sm text-gray-600 lg:hidden">Tap nodes to add them to canvas</p>
         </div>
         <button
           onClick={onClose}
@@ -25,8 +33,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
         <div
           draggable
           onDragStart={(e) => onDragStart(e, "input")}
-          onClick={onClose} // Close sidebar on mobile after drag
-          className="group cursor-move rounded-xl border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100 p-3 lg:p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 touch-manipulation"
+          onClick={() => onNodeClick("input")}
+          className="group cursor-move lg:cursor-move cursor-pointer rounded-xl border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100 p-3 lg:p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 touch-manipulation active:scale-95"
         >
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 lg:w-8 lg:h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-xs lg:text-sm">
@@ -42,8 +50,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
         <div
           draggable
           onDragStart={(e) => onDragStart(e, "output")}
-          onClick={onClose} // Close sidebar on mobile after drag
-          className="group cursor-move rounded-xl border-2 border-green-200 bg-gradient-to-r from-green-50 to-green-100 p-3 lg:p-4 hover:border-green-300 hover:shadow-md transition-all duration-200 touch-manipulation"
+          onClick={() => onNodeClick("output")}
+          className="group cursor-move lg:cursor-move cursor-pointer rounded-xl border-2 border-green-200 bg-gradient-to-r from-green-50 to-green-100 p-3 lg:p-4 hover:border-green-300 hover:shadow-md transition-all duration-200 touch-manipulation active:scale-95"
         >
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 lg:w-8 lg:h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold text-xs lg:text-sm">
@@ -60,7 +68,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
       <div className="mt-6 lg:mt-8 p-3 lg:p-4 bg-gray-50 rounded-lg">
         <h3 className="font-medium text-gray-900 mb-2 text-sm lg:text-base">Quick Tips</h3>
         <ul className="text-xs text-gray-600 space-y-1">
-          <li>• Drag nodes to canvas</li>
+          <li className="lg:hidden">• Tap nodes to add to canvas</li>
+          <li className="hidden lg:list-item">• Drag nodes to canvas</li>
           <li className="hidden lg:list-item">• Connect nodes by dragging handles</li>
           <li>• Click nodes to edit settings</li>
           <li className="hidden lg:list-item">• Press Delete to remove selected items</li>

@@ -166,7 +166,25 @@ export default function App() {
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    
+    // Listen for mobile node add events
+    const handleAddNode = (event: CustomEvent) => {
+      const { type } = event.detail;
+      const newNode = {
+        id: crypto.randomUUID(),
+        type: type === "input" ? "inputNode" : "outputNode",
+        position: { x: 100, y: 100 }, // Default position for mobile
+        data: { label: type, description: "", value: "" }
+      };
+      setNodes((n) => [...n, newNode]);
+    };
+    
+    window.addEventListener('addNode', handleAddNode as EventListener);
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('addNode', handleAddNode as EventListener);
+    };
   }, []);
 
   return (
@@ -357,6 +375,8 @@ export default function App() {
             ]);
           }}
           onDragOver={(e) => e.preventDefault()}
+          // Add touch support for mobile
+          onTouchStart={(e) => e.preventDefault()}
         >
 
           <ReactFlow
@@ -380,7 +400,11 @@ export default function App() {
             onConnect={(c) => setEdges((e) => addEdge(c, e))}
             onNodeClick={(_, n) => setSelectedNode(n)}
             fitView
-            className="bg-gray-50"
+            className="bg-gray-50 touch-none"
+            panOnScroll={true}
+            zoomOnScroll={true}
+            zoomOnPinch={true}
+            panOnDrag={true}
           >
             <Background color="#e5e7eb" gap={20} />
             <MiniMap className="bg-white border border-gray-200 rounded-lg" />
